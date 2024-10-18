@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRS India Field Agent Reporting v2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        #report-form, #dashboard {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #007bff;
+            text-align: center;
+        }
+        form {
+            display: grid;
+            gap: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        button {
+            padding: 12px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .grid-item {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-user-tie"></i> QRS India Pvt Ltd - Field Agent Reporting Tool v2</h1>
+    </header>
+
+    <div id="report-form">
+        <h2>Submit Your Report</h2>
+        <form id="agent-report-form">
+            <label for="agentName">Agent Name:</label>
+            <select id="agentName" required>
+                <option value="">Select Agent</option>
+                <option value="Jyoti Arora">Jyoti Arora</option>
+                <option value="Gita Sharma">Gita Sharma</option>
+            </select>
+
+            <label for="doctorName">Doctor Name:</label>
+            <input type="text" id="doctorName" required>
+
+            <label for="doctorPhone">Doctor Phone Number:</label>
+            <input type="tel" id="doctorPhone" required pattern="[0-9]{10}" placeholder="Enter 10-digit phone number">
+
+            <label for="hospitalName">Hospital/Clinic Name:</label>
+            <input type="text" id="hospitalName" required>
+
+            <label for="clientFeedback">Client Feedback:</label>
+            <textarea id="clientFeedback" required></textarea>
+
+            <label for="salesMetrics">Sales Metrics:</label>
+            <input type="number" id="salesMetrics" required>
+
+            <label for="followUpMeetings">Number of Follow-Up Meetings:</label>
+            <input type="number" id="followUpMeetings" required>
+
+            <label for="doctorInterest">Doctor's Interest in Product:</label>
+            <select id="doctorInterest" required>
+                <option value="">Select Option</option>
+                <option value="Very Interested">Very Interested</option>
+                <option value="Somewhat Interested">Somewhat Interested</option>
+                <option value="Neutral">Neutral</option>
+                <option value="Not Interested">Not Interested</option>
+            </select>
+
+            <button type="submit"><i class="fas fa-paper-plane"></i> Submit Report</button>
+        </form>
+    </div>
+
+    <div id="dashboard">
+        <h2>Dashboard</h2>
+        <div class="grid-container" id="grid-container"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCpcUWB7q_Dr6zONnrrHZ4Oek6CKqynwxM",
+            authDomain: "field-agent-85e4d.firebaseapp.com",
+            projectId: "field-agent-85e4d",
+            storageBucket: "field-agent-85e4d.appspot.com",
+            messagingSenderId: "943481749888",
+            appId: "1:943481749888:web:2d6d1d2d2a449cc6450165",
+            measurementId: "G-0NEVBPBB9P"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById("agent-report-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const reportData = Object.fromEntries(formData.entries());
+            reportData.timestamp = new Date();
+
+            try {
+                await addDoc(collection(db, "reports"), reportData);
+                alert("Report submitted successfully!");
+                e.target.reset();
+            } catch (error) {
+                console.error("Error adding report: ", error);
+                alert("Error submitting report. Please try again.");
+            }
+        });
+
+        function setupDashboardListener() {
+            const q = query(collection(db, "reports"), orderBy("timestamp", "desc"));
+            onSnapshot(q, (querySnapshot) => {
+                const gridContainer = document.getElementById("grid-container");
+                gridContainer.innerHTML = "";
+                querySnapshot.forEach((doc) => {
+                    const report = doc.data();
+                    const gridItem = document.createElement("div");
+                    gridItem.className = "grid-item";
+                    gridItem.innerHTML = `
+                        <h3>${report.hospitalName} - ${report.doctorName}</h3>
+                        <p><strong>Agent:</strong> ${report.agentName}</p>
+                        <p><strong>Doctor Phone:</strong> ${report.doctorPhone}</p>
+                        <p><strong>Feedback:</strong> ${report.clientFeedback}</p>
+                        <p><strong>Sales Metrics:</strong> ${report.salesMetrics}</p>
+                        <p><strong>Follow-Up Meetings:</strong> ${report.followUpMeetings}</p>
+                        <p><strong>Doctor's Interest:</strong> ${report.doctorInterest}</p>
+                        <p><strong>Date:</strong> ${report.timestamp.toDate().toLocaleString()}</p>
+                        <button class="delete-btn" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
+                    `;
+                    gridContainer.appendChild(gridItem);
+                });
+
+                // Add event listeners for delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.target.closest('.delete-btn').dataset.id;
+                        if (confirm("Are you sure you want to delete this report?")) {
+                            try {
+                                await deleteDoc(doc(db, "reports", id));
+                                alert("Report deleted successfully!");
+                            } catch (error) {
+                                console.error("Error deleting report: ", error);
+                                alert("Error deleting report. Please try again.");
+                            }
+                        }
+                    });
+                });
+            });
+        }
+
+        setupDashboardListener();
+    </script>
+</body>
+</html>
