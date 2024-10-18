@@ -154,8 +154,8 @@
             <label for="agentName">Agent Name:</label>
             <select id="agentName" required>
                 <option value="">Select Agent</option>
-                <option value="Jyoti Arora">Ms.Jyoti Arora</option>
-                <option value="Gita Sharma">Ms.Gitanjali Sharma</option>
+                <option value="Jyoti Arora">Jyoti Arora</option>
+                <option value="Gita Sharma">Gita Sharma</option>
             </select>
 
             <label for="doctorName">Doctor Name:</label>
@@ -271,7 +271,7 @@
                         <p><strong>Sales Metrics:</strong> ${report.salesMetrics}</p>
                         <p><strong>Follow-Up Meetings:</strong> ${report.followUpMeetings}</p>
                         <p><strong>Doctor's Interest:</strong> ${report.doctorInterest}</p>
-                        <p><strong>Date:</strong> ${new Date(report.timestamp).toLocaleString()}</p>
+                        <p><strong>Date:</strong> ${report.timestamp.toDate().toLocaleString()}</p>
                         <button class="delete-btn" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
                     `;
                     gridContainer.appendChild(gridItem);
