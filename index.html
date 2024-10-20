@@ -110,22 +110,6 @@
             -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
             animation: fadein 0.5s, fadeout 0.5s 2.5s;
         }
-        @-webkit-keyframes fadein {
-            from {bottom: 0; opacity: 0;}
-            to {bottom: 30px; opacity: 1;}
-        }
-        @keyframes fadein {
-            from {bottom: 0; opacity: 0;}
-            to {bottom: 30px; opacity: 1;}
-        }
-        @-webkit-keyframes fadeout {
-            from {bottom: 30px; opacity: 1;}
-            to {bottom: 0; opacity: 0;}
-        }
-        @keyframes fadeout {
-            from {bottom: 30px; opacity: 1;}
-            to {bottom: 0; opacity: 0;}
-        }
         #debug-console {
             max-width: 800px;
             margin: 20px auto;
@@ -151,11 +135,24 @@
     <div id="report-form">
         <h2>Submit Your Report</h2>
         <form id="agent-report-form">
+            <label for="cityName">Select City:</label>
+            <select id="cityName" required>
+                <option value="">Select City</option>
+                <option value="Kurukshetra">Kurukshetra</option>
+                <option value="Karnal">Karnal</option>
+                <option value="Ladwa">Ladwa</option>
+                <option value="Kaithal">Kaithal</option>
+                <option value="Pehowa">Pehowa</option>
+                <option value="Yamunanagar">Yamunanagar</option>
+                <option value="Panipat">Panipat</option>
+                <option value="Sonipat">Sonipat</option>
+            </select>
+
             <label for="agentName">Agent Name:</label>
             <select id="agentName" required>
                 <option value="">Select Agent</option>
-                <option value="Jyoti Arora">Ms.Jyoti Arora</option>
-                <option value="Gitanjali Sharma">Ms.Gitanjali Sharma</option>
+                <option value="Jyoti Arora">Jyoti Arora</option>
+                <option value="Gita Sharma">Gita Sharma</option>
             </select>
 
             <label for="doctorName">Doctor Name:</label>
@@ -190,7 +187,7 @@
     </div>
 
     <div id="dashboard">
-        <h2>Dashboard</h2>
+        <h2>Dashboard - <span id="city-heading">All Cities</span></h2>
         <div class="grid-container" id="grid-container"></div>
     </div>
 
@@ -207,7 +204,7 @@
             projectId: "field-agent-85e4d",
             storageBucket: "field-agent-85e4d.appspot.com",
             messagingSenderId: "943481749888",
-            appId: "1:943481749888:web:2d6d1d2d2a449cc6450165",
+            appId: "1:943481749888:web:2d6d1d2a2a449cc6450165",
             measurementId: "G-0NEVBPBB9P"
         };
 
@@ -216,6 +213,13 @@
 
         const toast = document.getElementById("toast");
         const debugLog = document.getElementById("debug-log");
+        const cityNameSelect = document.getElementById("cityName");
+        const cityHeading = document.getElementById("city-heading");
+
+        cityNameSelect.addEventListener("change", () => {
+            const selectedCity = cityNameSelect.value;
+            cityHeading.textContent = selectedCity ? selectedCity : "All Cities";
+        });
 
         function showToast(message) {
             toast.innerText = message;
@@ -231,6 +235,7 @@
         document.getElementById("agent-report-form").addEventListener("submit", async (e) => {
             e.preventDefault();
             const reportData = {
+                cityName: document.getElementById("cityName").value,
                 agentName: document.getElementById("agentName").value,
                 doctorName: document.getElementById("doctorName").value,
                 doctorPhone: document.getElementById("doctorPhone").value,
@@ -265,6 +270,7 @@
                     gridItem.className = "grid-item";
                     gridItem.innerHTML = `
                         <h3>${report.hospitalName} - ${report.doctorName}</h3>
+                        <p><strong>City:</strong> ${report.cityName}</p>
                         <p><strong>Agent:</strong> ${report.agentName}</p>
                         <p><strong>Doctor Phone:</strong> ${report.doctorPhone}</p>
                         <p><strong>Feedback:</strong> ${report.clientFeedback}</p>
